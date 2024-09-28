@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        /* Heading styling */
+        h1 {
+            font-size: 36px;
+            color: tomato;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Search bar styling */
+        .search-bar {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .search-bar input[type="text"] {
+            width: 60%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-bar button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-left: 10px;
+            border: none;
+            background-color: #1a73e8;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .search-bar button:hover {
+            background-color: #155dbd;
+        }
+
+        /* Main content and filter section */
+        .content {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Course list styling */
+        .course-card {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            padding: 15px;
+            display: flex;
+            align-items: flex-start;
+            width: 800px;
+        }
+
+        .course-card img {
+            max-width: 250px;
+            height: 200px;
+            margin-right: 20px;
+        }
+
+        .course-card h3 {
+            margin: 0 0 10px;
+        }
+
+        .course-card p {
+            margin: 0 0 10px;
+        }
+
+        .course-card a {
+            text-decoration: none;
+            color: #007BFF;
+            font-weight: bold;
+        }
+
+        /* Filter section styling */
+        .filter-section {
+            flex: 1;
+            margin-left: 20px;
+            padding: 15px;
+            background-color: #f7f7f7;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .filter-section h3 {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .filter-section label {
+            font-size: 16px;
+            color: #555;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .filter-section input[type="checkbox"],
+        .filter-section input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .filter-section .filter-group {
+            margin-bottom: 20px;
+        }
+
+        .filter-section button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #1a73e8;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .filter-section button:hover {
+            background-color: #155dbd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Page Heading -->
+        <h1>Available Courses</h1>
+
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <input type="text" placeholder="Search for a course..." id="course-search-input">
+            <button type="button" id="search-button">Search</button>
+        </div>
+
+        <!-- Main content and filter section -->
+        <div class="content">
+            <!-- Course List -->
+            <div class="course-list">
+                {% for course in courses.courses %}
+                <div class="course-card">
+                    <img src="{{ course.image_url }}" alt="{{ course.course_name }}">
+                    <div>
+                        <h3>{{ course.course_name }}</h3>
+                        <p><strong>Description:</strong> {{ course.course_description|truncatewords:20 }}</p>
+                        <p><strong>Rating:</strong> {{ course.course_rating }}</p>
+                        <p><strong>Duration:</strong> {{ course.course_duration }}</p>
+                        <p><strong>Language:</strong> {{ course.course_language }}</p>
+                        <p><strong>Start Date:</strong> {{ course.course_start_date }}</p>
+                        <p><strong>Subject::</strong> {{ course.course_subject }}</p>
+                        <p><strong>Topic:</strong> {{ course.course_topic }}</p>
+                        <a href="{% url 'course_detail' course_id=course.course_id %}">View Course Details</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <h3>Filter Options</h3>
+
+                <div class="filter-group">
+                    <label for="language-filter">Language:</label>
+                    <label><input type="radio" name="language" value="English"> English</label>
+                    <label><input type="radio" name="language" value="Spanish"> Spanish</label>
+                    <label><input type="radio" name="language" value="French"> French</label>
+                </div>
+
+                <div class="filter-group">
+                    <label>Duration:</label>
+                    <label><input type="checkbox" name="duration" value="short"> Short (Less than 2 hours)</label>
+                    <label><input type="checkbox" name="duration" value="medium"> Medium (2-5 hours)</label>
+                    <label><input type="checkbox" name="duration" value="long"> Long (More than 5 hours)</label>
+                </div>
+
+                <button type="button" id="apply-filters">Apply Filters</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Search functionality
+        document.getElementById('search-button').addEventListener('click', function() {
+            let searchInput = document.getElementById('course-search-input').value.toLowerCase();
+            let courseItems = document.querySelectorAll('.course-card');
+
+            courseItems.forEach(item => {
+                let courseTitle = item.querySelector('h3').textContent.toLowerCase();
+                if (courseTitle.includes(searchInput)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        // Filter functionality
+        document.getElementById('apply-filters').addEventListener('click', function() {
+            let selectedLanguage = document.querySelector('input[name="language"]:checked');
+            let selectedDurations = document.querySelectorAll('input[name="duration"]:checked');
+            let courseItems = document.querySelectorAll('.course-card');
+
+            courseItems.forEach(item => {
+                let courseLanguage = item.querySelector('p:nth-of-type(4)').textContent.split(': ')[1];
+                let courseDuration = item.querySelector('p:nth-of-type(3)').textContent.split(': ')[1];
+
+                // Filter by language
+                let showByLanguage = !selectedLanguage || courseLanguage === selectedLanguage.value;
+
+                // Filter by duration
+                let showByDuration = true;
+                selectedDurations.forEach(function(duration) {
+                    if (
+                        (duration.value === 'short' && courseDuration < 2) ||
+                        (duration.value === 'medium' && courseDuration >= 2 && courseDuration <= 5) ||
+                        (duration.value === 'long' && courseDuration > 5)
+                    ) {
+                        showByDuration = true;
+                    }
+                });
+
+                if (showByLanguage && showByDuration) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
